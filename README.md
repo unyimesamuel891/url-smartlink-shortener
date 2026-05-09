@@ -14,9 +14,9 @@ A minimal, intentional URL shortener with real-time analytics. Built with React,
 - **No Database Setup** — Uses JSON file storage for simplicity and portability
 - **Copy Feedback** — Instant visual feedback when copying short links
 - **Minimal Brutalism Design** — Honest, intentional UI with warm accents and monospace typography
-![App Screenshot](./screenshot.png)
+![App Screenshot](./Screenshot.png)
 
-##Design Philosophy
+## Design Philosophy
 
 **Minimal Brutalism with Warm Accents** — This app rejects generic SaaS templates in favor of a handcrafted aesthetic. Every design decision serves a purpose:
 
