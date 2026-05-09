@@ -4,7 +4,7 @@ A minimal, intentional URL shortener with real-time analytics. Built with React,
 
 ![link. Home Page](https://img.shields.io/badge/React-19-blue?logo=react) ![Express](https://img.shields.io/badge/Express-4-green?logo=express) ![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38B2AC?logo=tailwindcss) ![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue?logo=typescript)
 
-## ✨ Features
+## Features
 
 - **Instant URL Shortening** — Paste a long URL, get a short link in milliseconds
 - **Click Analytics** — Track clicks over time with interactive Recharts visualizations
@@ -14,8 +14,9 @@ A minimal, intentional URL shortener with real-time analytics. Built with React,
 - **No Database Setup** — Uses JSON file storage for simplicity and portability
 - **Copy Feedback** — Instant visual feedback when copying short links
 - **Minimal Brutalism Design** — Honest, intentional UI with warm accents and monospace typography
+![App Screenshot](./screenshot.png)
 
-## 🎨 Design Philosophy
+##Design Philosophy
 
 **Minimal Brutalism with Warm Accents** — This app rejects generic SaaS templates in favor of a handcrafted aesthetic. Every design decision serves a purpose:
 
@@ -24,9 +25,9 @@ A minimal, intentional URL shortener with real-time analytics. Built with React,
 - **Interactions:** Subtle hover states, fade-in animations, and tactile feedback
 - **Layout:** Asymmetric grids and intentional whitespace create visual interest
 
-The result is a tool that feels **made by developers, for developers** — not a corporate platform or amateur project.
+The result is a tool that feels **made by a developer(me), for developers** — not a corporate platform or amateur project.
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -61,7 +62,7 @@ pnpm start
 
 The app will be available at `http://localhost:3000`.
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 smart-link-shortener/
@@ -96,7 +97,7 @@ smart-link-shortener/
 └── DOCUMENTATION.md                # Full documentation
 ```
 
-## 🔌 API Endpoints
+## API Endpoints
 
 All endpoints are prefixed with `/api` except for the redirect handler.
 
@@ -158,7 +159,7 @@ curl http://localhost:3000/api/links/abc123
 # }
 ```
 
-## 🛠 Tech Stack
+## Tech Stack
 
 ### Frontend
 - **React 19** — UI library with hooks
@@ -179,7 +180,7 @@ curl http://localhost:3000/api/links/abc123
 - **pnpm** — Fast package manager
 - **esbuild** — JavaScript bundler
 
-## 📊 Data Model
+## Data Model
 
 ### Link Object
 ```typescript
@@ -200,7 +201,7 @@ interface Click {
 }
 ```
 
-## 🎯 Key Features Explained
+## Key Features Explained
 
 ### URL Shortening
 When you paste a URL and click "Shorten," the app:
@@ -231,7 +232,7 @@ For each link, you can see:
 - **Link metadata** — Original URL, creation date, total clicks
 - **Quick actions** — Copy link or delete it
 
-## 🚢 Deployment
+## Deployment
 
 ### Deploy to Vercel (Frontend)
 
@@ -268,7 +269,7 @@ Your backend will be live at `https://smart-link-shortener-api.onrender.com`
 
 **See [DOCUMENTATION.md](./DOCUMENTATION.md) for detailed deployment guide.**
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### "Cannot GET /:code"
 Make sure the backend is running and `VITE_API_URL` is set correctly in the frontend.
@@ -282,7 +283,7 @@ Check that `data/db.json` exists and is readable. The file is auto-created on fi
 ### "WebSocket connection failed"
 This is a development-only issue. The production build doesn't use WebSocket. If it persists, try `pnpm dev` again.
 
-## 📝 Scripts
+## Scripts
 
 ```bash
 pnpm dev        # Start development server with hot reload
@@ -292,7 +293,7 @@ pnpm check      # Run TypeScript type checking
 pnpm format     # Format code with Prettier
 ```
 
-## 🎓 Learning Resources
+## Learning Resources
 
 This project demonstrates:
 - **Full-stack development** with React and Express
@@ -306,7 +307,7 @@ This project demonstrates:
 
 Perfect for learning or as a portfolio project.
 
-## 🔮 Future Improvements
+## Future Improvements
 
 - **User authentication** — Create accounts and save links
 - **Custom slugs** — Let users choose short codes
@@ -317,23 +318,23 @@ Perfect for learning or as a portfolio project.
 - **API key access** — Programmatic link creation
 - **Dark mode** — Theme switcher for dark theme
 
-## 📄 License
+## License
 
 MIT License — feel free to use this project for personal or commercial purposes.
 
-## 👤 Author
+## Author
 
-Built with ❤️ by [Your Name]
+Built by my humble self, Unyime Duncan
 
 - Portfolio: [your-website.com]
 - GitHub: [@your-username](https://github.com/your-username)
 - Twitter: [@your-handle](https://twitter.com/your-handle)
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📞 Support
+## Support
 
 If you have questions or run into issues:
 1. Check the [DOCUMENTATION.md](./DOCUMENTATION.md) for detailed guides
@@ -342,4 +343,4 @@ If you have questions or run into issues:
 
 ---
 
-**Made with Vite ⚡ React ⚛️ Express 🚀**
+**Made with Vite ⚡ React ⚛️ Express **
