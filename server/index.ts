@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import { createServer } from "http";
 import path from "path";
 import { fileURLToPath } from "url";
-import { JSONFilePreset } from "lowdb/node";
+import { MongoClient, Collection } from "mongodb";
 import { nanoid } from "nanoid";
 import cors from "cors";
 
@@ -22,14 +22,17 @@ interface Link {
   clicks: Click[];
 }
 
-interface Database {
-  links: Link[];
-}
+// MongoDB setup
+const MONGODB_URI = process.env.MONGODB_URI || "";
+let linksCollection: Collection<Link>;
 
-// Initialize database
-const dbPath = path.join(__dirname, "..", "data", "db.json");
-const defaultData: Database = { links: [] };
-let db: Awaited<ReturnType<typeof JSONFilePreset<Database>>>;
+async function connectDB() {
+  const client = new MongoClient(MONGODB_URI);
+  await client.connect();
+  const db = client.db("smartlink");
+  linksCollection = db.collection<Link>("links");
+  console.log("Connected to MongoDB");
+}
 
 async function startServer() {
   const app = express();
@@ -54,11 +57,6 @@ async function startServer() {
     }
   }
 
-  // Helper function: Find link by code
-  function findLinkByCode(code: string): Link | undefined {
-    return db.data.links.find((link: Link) => link.code === code);
-  }
-
   // API Routes
 
   /**
@@ -80,9 +78,7 @@ async function startServer() {
       }
 
       // Check for duplicates
-      const existingLink = db.data.links.find(
-        (link) => link.originalUrl === url
-      );
+      const existingLink = await linksCollection.findOne({ originalUrl: url });
       if (existingLink) {
         res.status(200).json({
           code: existingLink.code,
@@ -92,9 +88,9 @@ async function startServer() {
         return;
       }
 
-      // Generate new short code
+      // Generate unique short code
       let code = generateShortCode();
-      while (findLinkByCode(code)) {
+      while (await linksCollection.findOne({ code })) {
         code = generateShortCode();
       }
 
@@ -107,8 +103,7 @@ async function startServer() {
         clicks: [],
       };
 
-      db.data.links.push(newLink);
-      await db.write();
+      await linksCollection.insertOne(newLink);
 
       res.status(201).json({
         code,
@@ -127,15 +122,16 @@ async function startServer() {
    */
   app.get("/api/links", async (req: Request, res: Response) => {
     try {
-      const links = db.data.links.map((link: Link) => ({
-        id: link.id,
-        code: link.code,
-        originalUrl: link.originalUrl,
-        createdAt: link.createdAt,
-        clickCount: link.clicks.length,
-      }));
-
-      res.json(links);
+      const links = await linksCollection.find().toArray();
+      res.json(
+        links.map((link) => ({
+          id: link.id,
+          code: link.code,
+          originalUrl: link.originalUrl,
+          createdAt: link.createdAt,
+          clickCount: link.clicks.length,
+        }))
+      );
     } catch (error) {
       console.error("Error in GET /api/links:", error);
       res.status(500).json({ error: "Failed to fetch links" });
@@ -149,7 +145,7 @@ async function startServer() {
   app.get("/api/links/:code", async (req: Request, res: Response) => {
     try {
       const { code } = req.params;
-      const link = findLinkByCode(code);
+      const link = await linksCollection.findOne({ code });
 
       if (!link) {
         res.status(404).json({ error: "Link not found" });
@@ -177,17 +173,12 @@ async function startServer() {
   app.delete("/api/links/:code", async (req: Request, res: Response) => {
     try {
       const { code } = req.params;
-      const linkIndex = db.data.links.findIndex((link: Link) => link.code === code);
+      const result = await linksCollection.deleteOne({ code });
 
-      if (linkIndex === -1) {
+      if (result.deletedCount === 0) {
         res.status(404).json({ error: "Link not found" });
         return;
       }
-
-      if (linkIndex !== -1) {
-        db.data.links.splice(linkIndex, 1);
-      }
-      await db.write();
 
       res.json({ message: "Link deleted successfully" });
     } catch (error) {
@@ -203,7 +194,14 @@ async function startServer() {
   app.get("/:code", async (req: Request, res: Response) => {
     try {
       const { code } = req.params;
-      const link = findLinkByCode(code);
+
+      // Skip static file routes
+      if (code.includes(".")) {
+        res.status(404).send("Not found");
+        return;
+      }
+
+      const link = await linksCollection.findOne({ code });
 
       if (!link) {
         res.status(404).json({ error: "Short link not found" });
@@ -211,12 +209,10 @@ async function startServer() {
       }
 
       // Log the click
-      if (link) {
-        link.clicks.push({
-          timestamp: new Date().toISOString(),
-        });
-        await db.write();
-      }
+      await linksCollection.updateOne(
+        { code },
+        { $push: { clicks: { timestamp: new Date().toISOString() } } }
+      );
 
       // Redirect to original URL
       res.redirect(link.originalUrl);
@@ -247,6 +243,6 @@ async function startServer() {
 }
 
 (async () => {
-  db = await JSONFilePreset<Database>(dbPath, defaultData);
+  await connectDB();
   await startServer();
 })().catch(console.error);
