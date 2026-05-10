@@ -18,7 +18,7 @@ export default function LinkCard({
 }: LinkCardProps) {
   const [copied, setCopied] = useState(false);
 
-  const shortUrl = `${window.location.origin}/${link.code}`;
+  const shortUrl = `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/${link.code}`;
 
   const handleCopy = async () => {
     try {
