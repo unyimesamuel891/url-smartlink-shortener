@@ -4,6 +4,11 @@ A minimal, intentional URL shortener with real-time analytics. Built with React,
 
 ![link. Home Page](https://img.shields.io/badge/React-19-blue?logo=react) ![Express](https://img.shields.io/badge/Express-4-green?logo=express) ![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38B2AC?logo=tailwindcss) ![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue?logo=typescript)
 
+# link. — Smart URL Shortener
+
+🔗 **Live Demo:** [sclip.vercel.app](https://sclip.vercel.app)
+
+A minimal URL shortener for developers.
 ## Features
 
 - **Instant URL Shortening** — Paste a long URL, get a short link in milliseconds
