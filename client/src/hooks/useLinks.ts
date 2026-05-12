@@ -13,21 +13,54 @@ export interface LinkDetail extends LinkData {
 }
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const STORAGE_KEY = "my_link_codes";
+
+// Get this user's saved codes from localStorage
+function getSavedCodes(): string[] {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+// Save a new code to localStorage
+function saveCode(code: string) {
+  const codes = getSavedCodes();
+  if (!codes.includes(code)) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([...codes, code]));
+  }
+}
+
+// Remove a code from localStorage
+function removeCode(code: string) {
+  const codes = getSavedCodes().filter((c) => c !== code);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(codes));
+}
 
 export function useLinks() {
   const [links, setLinks] = useState<LinkData[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch all links
+  // Fetch only THIS user's links using their saved codes
   const fetchLinks = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${API_URL}/api/links`);
-      if (!response.ok) throw new Error("Failed to fetch links");
-      const data = await response.json();
-      setLinks(data);
+      const codes = getSavedCodes();
+      if (codes.length === 0) {
+        setLinks([]);
+        return;
+      }
+      const results = await Promise.all(
+        codes.map((code) =>
+          fetch(`${API_URL}/api/links/${code}`)
+            .then((r) => (r.ok ? r.json() : null))
+            .catch(() => null)
+        )
+      );
+      setLinks(results.filter(Boolean));
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";
       setError(message);
@@ -52,7 +85,7 @@ export function useLinks() {
     []
   );
 
-  // Shorten a URL
+  // Shorten a URL and save the code locally
   const shortenUrl = useCallback(
     async (url: string): Promise<{ code: string; shortUrl: string } | null> => {
       setError(null);
@@ -69,7 +102,7 @@ export function useLinks() {
         }
 
         const data = await response.json();
-        // Refresh links after shortening
+        saveCode(data.code); // Save to localStorage
         await fetchLinks();
         return data;
       } catch (err) {
@@ -89,10 +122,8 @@ export function useLinks() {
         const response = await fetch(`${API_URL}/api/links/${code}`, {
           method: "DELETE",
         });
-
         if (!response.ok) throw new Error("Failed to delete link");
-
-        // Refresh links after deletion
+        removeCode(code); // Remove from localStorage
         await fetchLinks();
         return true;
       } catch (err) {
@@ -104,7 +135,6 @@ export function useLinks() {
     [fetchLinks]
   );
 
-  // Fetch links on mount
   useEffect(() => {
     fetchLinks();
   }, [fetchLinks]);
